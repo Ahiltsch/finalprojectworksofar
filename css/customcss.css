@@ -1,0 +1,62 @@
+h1 {
+    color:whitesmoke; 
+}
+H2 {
+    color: black
+}
+.NGAtalk{
+    text-align: center;
+}
+.familypage{
+    text-align: center;
+  }
+  ol {
+    list-style-type: none; /* Removes the numbers */
+    padding: 0;            /* Removes default padding for alignment */
+    text-align: center;    /* Centers the text in the list */
+  }
+  a{
+    color:rgb(78, 129, 224);
+    text-decoration: underline;
+  }
+.firstsem
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f8ff; /* Light BYU blue */
+        margin: 0;
+        padding: 0;
+        text-align: center;
+      }
+  
+      h1 {
+        color: #002e5d; /* BYU navy */
+        margin-top: 20px;
+      }
+  
+      .collage {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+  
+      .collage img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      }
+  
+      .collage img:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      }
+  
+      .caption {
+        margin-top: 10px;
+        font-style: italic;
+        color: #444;
+      }

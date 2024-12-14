@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Alex's FPS Target Practice Game</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <!-- Font Awesome icons (free version)-->
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/styles.css" rel="stylesheet" />
+    <link href="../css/customcss.css" rel="stylesheet"/>
+    <title>FPS Target Practice Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+        }
+
+        #highScore {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+        }
+
+        #timer {
+            position: absolute;
+            top: 50px;
+            left: 10px;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+        }
+
+        #threeCanvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alex's Final Project Game Page</title>
+    <nav class="navbar navbar-expand-lg navbar-light" id="mainNav">
+        <div class="container px-4 px-lg-5">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                Menu
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto py-4 py-lg-0">
+                    <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="../index.html">Home</a></li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="../about.html">About</a></li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="Scratch.html">Portfolio</a></li>
+                        <li class="nav-item"> <a class="nav-link ps-lg3 py-3 py-lg-4" href="aiwebapp.html">Target Practice</a></li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="../contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div id="score">Score: 0</div>
+    <div id="highScore">High Score: 0</div>
+    <div id="timer">Time: 20</div>
+    <canvas id="gameCanvas"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // Three.js Setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.domElement.id = "threeCanvas";
+        document.body.appendChild(renderer.domElement);
+
+        // Shooting range floor
+        const floorGeometry = new THREE.PlaneGeometry(20, 20);
+        const floorMaterial = new THREE.MeshBasicMaterial({ color: 0x555555 });
+        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        floor.rotation.x = -Math.PI / 2;
+        scene.add(floor);
+
+        // Shooting range walls
+        const wallGeometry = new THREE.PlaneGeometry(20, 10);
+        const wallMaterial = new THREE.MeshBasicMaterial({ color: 0x777777 });
+
+        const wall1 = new THREE.Mesh(wallGeometry, wallMaterial);
+        wall1.position.set(0, 5, -10);
+        scene.add(wall1);
+
+        const wall2 = new THREE.Mesh(wallGeometry, wallMaterial);
+        wall2.rotation.y = Math.PI / 2;
+        wall2.position.set(-10, 5, 0);
+        scene.add(wall2);
+
+        const wall3 = new THREE.Mesh(wallGeometry, wallMaterial);
+        wall3.rotation.y = -Math.PI / 2;
+        wall3.position.set(10, 5, 0);
+        scene.add(wall3);
+
+        camera.position.set(0, 5, 10);
+        camera.lookAt(0, 0, 0);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // 2D Canvas Setup
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('score');
+        const highScoreDisplay = document.getElementById('highScore');
+        const timerDisplay = document.getElementById('timer');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let targets = [];
+        let score = 0;
+        let highScore = 0;
+        let timeLeft = 20;
+        let timerInterval;
+        let targetInterval;
+        const targetRadius = 20;
+
+        function resetGame() {
+            score = 0;
+            timeLeft = 20;
+            targets = [];
+            updateScore();
+            updateTimer();
+        }
+
+        function createTarget() {
+            const x = Math.random() * (canvas.width - targetRadius * 2) + targetRadius;
+            const y = Math.random() * (canvas.height - targetRadius * 2) + targetRadius;
+            const target = { x, y, radius: targetRadius };
+            targets.push(target);
+
+            setTimeout(() => {
+                if (targets.includes(target)) {
+                    targets = targets.filter(t => t !== target);
+                }
+            }, 1000);
+        }
+
+        function drawTarget(target) {
+            ctx.beginPath();
+            ctx.arc(target.x, target.y, target.radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'red';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function updateScore() {
+            scoreDisplay.textContent = `Score: ${score}`;
+            if (score > highScore) {
+                highScore = score;
+                highScoreDisplay.textContent = `High Score: ${highScore}`;
+            }
+        }
+
+        function updateTimer() {
+            timerDisplay.textContent = `Time: ${timeLeft}`;
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            targets.forEach(drawTarget);
+            requestAnimationFrame(gameLoop);
+        }
+
+        canvas.addEventListener('click', (event) => {
+            const { clientX, clientY } = event;
+            const rect = canvas.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            let hit = false;
+            targets = targets.filter(target => {
+                const distance = Math.hypot(target.x - x, target.y - y);
+                if (distance <= target.radius) {
+                    score++;
+                    hit = true;
+                    return false;
+                }
+                return true;
+            });
+
+            if (!hit) {
+                score--;
+            }
+            updateScore();
+        });
+
+        function showGameOverPopup() {
+            const restart = confirm(`Game Over! Final Score: ${score}\n\nDo you want to start a new game or return to the main page? Click OK to start a new game, or Cancel to return.`);
+            if (restart) {
+                startGame();
+            } else {
+                window.location.href = 'file:///C:/Users/7Zork/Desktop/IS%20201%20things/Final%20Project%20IS%20201/index.html'; // Change this to your main page URL
+            }
+        }
+
+        function startGame() {
+            resetGame();
+
+            clearInterval(timerInterval);
+            clearInterval(targetInterval);
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    clearInterval(targetInterval);
+                    showGameOverPopup();
+                }
+            }, 1000);
+
+            targetInterval = setInterval(createTarget, 1000);
+
+            gameLoop();
+        }
+
+        updateTimer();
+        startGame();
+    </script>
+</body>
+</html>
